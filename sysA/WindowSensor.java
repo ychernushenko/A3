@@ -1,4 +1,4 @@
-package systemA;
+package sysA;
 
 import InstrumentationPackage.*;
 import MessagePackage.*;
@@ -9,15 +9,14 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-class MotionSensor
+class WindowSensor
 {
 
 	private MessageManagerInterface managerInterface = null;	// Interface object to the message manager
 
 	private MessageWindow mw;
 
-	
-	public MotionSensor(String title, float winPosX, float winPosY, final MessageManagerInterface em){
+	public WindowSensor(String title, float winPosX, float winPosY, final MessageManagerInterface em){
 		managerInterface = em;
 		mw = new MessageWindow(title, winPosX, winPosY);
 		JButton button = new JButton();
@@ -36,19 +35,18 @@ class MotionSensor
 		buttonFrame.setVisible(true);
 	}
 	
-
 	private void buttonActionPerformed(ActionEvent evt) {
 
-		Message msg = new Message( Configuration.MOTION_SENSOR_ID, "MD" );
+		Message msg = new Message( Configuration.WINDOW_SENSOR_ID, "WB" );
 		// Here we send the message to the message manager.
 		try
 		{
 			managerInterface.SendMessage( msg );
-			mw.WriteMessage("Suspicious motion detected!");
+			mw.WriteMessage("Window break detected!");
 		} // try
 		catch (Exception e)
 		{
-			System.out.println( "Error Posting Motion detection:: " + e );
+			System.out.println( "Error Posting Window Break:: " + e );
 		} // catch
 
 	}
@@ -61,7 +59,6 @@ class MotionSensor
 		Message Msg = null;				// Message object
 		boolean done = false;
 		int	Delay = 2500;				// The loop delay (2.5 seconds)
-
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -121,10 +118,7 @@ class MotionSensor
 			float winPosY = 0.60f;	//This is the Y position of the message window in terms
 			//of a percentage of the screen height
 
-			MotionSensor ms = new MotionSensor("Motion Sensor", winPosX, winPosY, em);
-
-
-
+			WindowSensor ws = new WindowSensor("Window Sensor", winPosX, winPosY, em);
 
 			while (!done) {
 				try
@@ -134,7 +128,7 @@ class MotionSensor
 
 				catch( Exception e )
 				{
-					ms.mw.WriteMessage("Error getting message queue::" + e );
+					ws.mw.WriteMessage("Error getting message queue::" + e );
 
 				} // catch
 
@@ -159,11 +153,11 @@ class MotionSensor
 
 						catch (Exception e)
 						{
-							ms.mw.WriteMessage("Error unregistering: " + e);
+							ws.mw.WriteMessage("Error unregistering: " + e);
 
 						} // catch
 
-						ms.mw.WriteMessage("\n\nSimulation Stopped. \n");
+						ws.mw.WriteMessage("\n\nSimulation Stopped. \n");
 
 					} // if
 					try
@@ -174,9 +168,10 @@ class MotionSensor
 
 					catch( Exception e )
 					{
-						ms.mw.WriteMessage("Sleep error:: " + e );
+						ws.mw.WriteMessage("Sleep error:: " + e );
 
 					} // catch
+
 				} // for
 			}
 
@@ -189,4 +184,6 @@ class MotionSensor
 
 	} // main
 
-} // Motion Sensor
+} // Window Sensor
+
+
