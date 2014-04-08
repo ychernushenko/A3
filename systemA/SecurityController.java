@@ -1,4 +1,4 @@
-package systemA;
+package sysA;
 /******************************************************************************************************************
  * File:HumidityController.java
  * Course: 17655
@@ -40,7 +40,7 @@ class SecurityController
 		Message Msg = null;					// Message object
 		MessageQueue eq = null;				// Message Queue
 		MessageManagerInterface em = null;	// Interface object to the message manager
-		boolean armed = false;	// Heater state: false == off, true == on
+		boolean armed = true;				// state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
 
@@ -153,23 +153,25 @@ class SecurityController
 					Msg = eq.GetMessage();
 
 					switch (Msg.GetMessageId()) {
-					case Configuration.SECURITY_MONITOR_ID:
-						if (Msg.GetMessage().equalsIgnoreCase("ARM")){
-							armed = true;
-							mw.WriteMessage("Received security controller ON message" );
-						}else if (Msg.GetMessage().equalsIgnoreCase("DISARM")){
-							armed = false;
-							mw.WriteMessage("Received security controller OFF message" );
-						}
-						break;
 					case Configuration.DOOR_SENSOR_ID:
+						mw.WriteMessage("Get door breaking message!" );
 						postMessage(em, "Door");
 						break;
 					case Configuration.WINDOW_SENSOR_ID:
+						mw.WriteMessage("Get window breaking message!" );
 						postMessage(em, "Window");
 						break;
 					case Configuration.MOTION_SENSOR_ID:
+						mw.WriteMessage("Get motion detected message!" );
 						postMessage(em, "Motion");
+						break;
+					case Configuration.Arm:
+						mw.WriteMessage("Arm System message!" );
+						armed = true;
+						break;
+					case Configuration.Disarm:
+						mw.WriteMessage("Get Disarm System message!" );
+						armed = false;
 						break;
 					case 99:
 						// If the message ID == 99 then this is a signal that the simulation
@@ -222,7 +224,19 @@ class SecurityController
 
 	static private void postMessage(MessageManagerInterface ei, String m ){
 		// Here we create the message.
-		Message msg = new Message( Configuration.SECURITY_CONTROLLER_ID, m );
+		Message msg;
+		if( m.equals("Door") )
+		{
+			msg = new Message( Configuration.Door_break, m );
+		}
+		else if( m.equals("Window") )
+		{
+			msg = new Message( Configuration.Window_break, m );
+		}
+		else
+		{
+			msg = new Message( Configuration.Motion_Detected , m );
+		}
 		// Here we send the message to the message manager.
 		try{
 			ei.SendMessage( msg );

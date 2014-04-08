@@ -1,4 +1,4 @@
-package systemA;
+package sysA;
 
 import InstrumentationPackage.*;
 import MessagePackage.*;
