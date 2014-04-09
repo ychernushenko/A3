@@ -9,6 +9,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import common.Configuration;
+import common.Device;
+
 class MotionSensor
 {
 
@@ -123,7 +126,8 @@ class MotionSensor
 
 			MotionSensor ms = new MotionSensor("Motion Sensor", winPosX, winPosY, em);
 
-
+			Device device = new Device(Configuration.normal_period, "Motion Sensor", "Motion sensor will alarm if any suspecious motions are detected.");
+			device.run();
 
 
 			while (!done) {

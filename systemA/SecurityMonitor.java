@@ -34,6 +34,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import common.Configuration;
+
 class SecurityMonitor extends Thread
 {
 	private MessageManagerInterface em = null;	// Interface object to the message manager

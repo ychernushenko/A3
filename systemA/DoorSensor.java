@@ -9,13 +9,17 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-class DoorSensor {
+import common.Configuration;
+import common.Device;
+
+class DoorSensor{
 
 	private  MessageManagerInterface managerInterface = null;	// Interface object to the message manager
 
 	private  MessageWindow mw;
 
 	public DoorSensor(String title, float winPosX, float winPosY, final MessageManagerInterface em) {
+		
 		managerInterface = em;
 		mw = new MessageWindow(title, winPosX, winPosY);
 		JButton button = new JButton();
@@ -52,7 +56,7 @@ class DoorSensor {
 		MessageQueue eq = null;			// Message Queue
 		Message Msg = null;				// Message object
 		int	Delay = 2500;				// The loop delay (2.5 seconds)
-
+		
 		boolean done = false;
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -108,7 +112,9 @@ class DoorSensor {
 
 			DoorSensor ds = new DoorSensor("Door Sensor", winPosX, winPosY, em);
 
-
+			Device device = new Device(Configuration.normal_period, "Door Sensor", "Door sensor will alarm if any door break is detect.");
+			device.run();
+			
 			while ( !done ){
 				// Get the message queue
 				try{

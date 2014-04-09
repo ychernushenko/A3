@@ -29,6 +29,8 @@ package systemA;
  *	static private void ConfirmMessage(MessageManagerInterface ei, String m )
  *
  ******************************************************************************************************************/
+import common.Configuration;
+import common.Device;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 
@@ -133,6 +135,10 @@ class SecurityController
 			 ** Here we start the main simulation loop
 			 *********************************************************************/
 
+			Device device = new Device(Configuration.normal_period, "Security Controller", "Security controller will redirect the security messages if system is armed.");
+			device.run();
+			
+			
 			while ( !Done )
 			{
 				try

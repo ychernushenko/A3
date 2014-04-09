@@ -9,6 +9,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import common.Configuration;
+import common.Device;
+
 class WindowSensor
 {
 
@@ -120,6 +123,10 @@ class WindowSensor
 
 			WindowSensor ws = new WindowSensor("Window Sensor", winPosX, winPosY, em);
 
+			
+			Device device = new Device(Configuration.normal_period, "Window Sensor", "Window sensor will alarm if any window break is detected.");
+			device.run();
+			
 			while (!done) {
 				try
 				{
