@@ -44,15 +44,18 @@ class SecurityMonitor extends Thread
 	boolean WindowBreak = false;				// Counter for window break
 	boolean DoorBreak = false;					// Counter for Door break
 	boolean MotionDetected = false;				// Counter for motion detected
+	boolean FireDetected = false;				// Counter for fire detected
 	boolean Registered = true;					// Signifies that this class is registered with an message manager.
 	MessageWindow mw = null;					// This is the message window
 	boolean Armed = true;						// flag to disarm the system
 	private JButton Close_win;
 	private JButton Close_door;
 	private JButton Close_motion;
+	private JButton Close_fire;
 	Indicator dr;
 	Indicator wi;
 	Indicator mo;
+	Indicator fa;
 	
 	public SecurityMonitor()
 	{
@@ -142,6 +145,21 @@ class SecurityMonitor extends Thread
 			});
 			Close_motion.setEnabled(true);
 			
+			Close_fire = new JButton();
+			Close_fire.setText("Shutdown fire alarm");
+			Close_fire.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						FirebuttonActionPerformed(evt);
+				}
+			});
+			Close_fire.setEnabled(true);
+			
+			mw = new MessageWindow("Security Monitoring Console", 0, 0);
+			fa = new Indicator ("Fire", mw.GetX()+ mw.Width(), (int)(mw.Height()), 1 );
+			wi = new Indicator ("Window", mw.GetX()+ mw.Width(), (int)(mw.Height()/2), 1 );
+			mo = new Indicator ("Motion", mw.GetX()+ mw.Width(), (int)(mw.Height()/3), 1 );
+			dr = new Indicator ("Door", mw.GetX()+ mw.Width(), 0, 1 );
+			
 			JFrame frame1 = new JFrame("JAVA");
 			frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame1.setSize(200,50);
@@ -160,10 +178,11 @@ class SecurityMonitor extends Thread
 			frame3.getContentPane().add(Close_motion);
 			frame3.setVisible(true);
 			
-			mw = new MessageWindow("Security Monitoring Console", 0, 0);
-			wi = new Indicator ("Window", mw.GetX()+ mw.Width(), (int)(mw.Height()/2), 1 );
-			mo = new Indicator ("Motion", mw.GetX()+ mw.Width(), (int)(mw.Height()/3), 1 );
-			dr = new Indicator ("Door", mw.GetX()+ mw.Width(), 0, 1 );
+			JFrame frame4 = new JFrame("JAVA");
+			frame4.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame4.setSize(200,50);
+			frame4.getContentPane().add(Close_fire);
+			frame4.setVisible(true);
 
 			mw.WriteMessage( "Registered with the message manager." );
 
@@ -241,6 +260,13 @@ class SecurityMonitor extends Thread
 						mw.WriteMessage("Motion has been discovered!" );
 						MotionDetected = true;
 					} // if
+					
+					if ( Msg.GetMessageId() == Configuration.Fire_detected ) // Fire
+					{
+						fa.SetLampColorAndMessage("FIRE", 3);
+						mw.WriteMessage("Fire has been discovered!" );
+						FireDetected = true;
+					} // if
 
 					// If the message ID == 99 then this is a signal that the simulation
 					// is to end. At this point, the loop termination flag is set to
@@ -270,6 +296,7 @@ class SecurityMonitor extends Thread
 						dr.dispose();
 						wi.dispose();
 						mo.dispose();
+						fa.dispose();
 
 					} // if
 
@@ -288,6 +315,11 @@ class SecurityMonitor extends Thread
 				if( !MotionDetected )
 				{
 					mo.SetLampColorAndMessage("Motion", 1);
+				}
+				
+				if( !FireDetected )
+				{
+					fa.SetLampColorAndMessage("Fire", 1);
 				}
 
 				try
@@ -423,6 +455,12 @@ class SecurityMonitor extends Thread
 	private void MotionbuttonActionPerformed(ActionEvent evt) {
 
 		MotionDetected = false;
+
+	}
+	
+	private void FirebuttonActionPerformed(ActionEvent evt) {
+
+		FireDetected = false;
 
 	}
 } // ECSMonitor
