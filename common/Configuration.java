@@ -24,6 +24,13 @@ public class Configuration {
 
 	//Message IDs for system B.
 	
+	public final  static  int FIRE_CONTROLLER_ID = 8000;
+	public final  static  int SPRINKLER_CONTROLLER_ID = 8100;
+	
+	public final  static  int FIRE_SENSOR_ID = 8200;
+	
+	public final  static  int Fire_detected = 8001;
+	
 	
 	//Message IDs for system C.
 	
