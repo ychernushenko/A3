@@ -95,7 +95,7 @@ class MaintenanceMonitor extends Thread
 
 	} // Constructor
 
-	class Checker implements Runnable
+	class Checker implements Thread
 	{
 		@Override
 		public void run() {
