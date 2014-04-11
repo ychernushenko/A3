@@ -30,7 +30,11 @@
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
+
 import java.util.*;
+
+import common.Configuration;
+import common.Device;
 
 class HumidityController
 {
@@ -136,7 +140,9 @@ class HumidityController
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-
+	    	Device device = new Device(Configuration.normal_period, "Humidity Controller", "Turn on/off the humidifier/dehumidifier", em);
+			device.run();
+	    	
 			while ( !Done )
 			{
 				try

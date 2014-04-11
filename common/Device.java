@@ -9,10 +9,11 @@ public class Device implements Runnable{
 	private String deviceName;
 	private int heartbeat;
 	private MessageManagerInterface msgInterface;
-	public Device(int heartbeat, String deviceName, String descrption){
+	public Device(int heartbeat, String deviceName, String descrption, MessageManagerInterface msgInterface){
 		this.heartbeat = heartbeat;
 		this.description = descrption;
 		this.deviceName = deviceName;
+		this.msgInterface = msgInterface;
 	}
 
 

@@ -23,7 +23,11 @@
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
+
 import java.util.*;
+
+import common.Configuration;
+import common.Device;
 
 class TemperatureSensor
 {
@@ -143,7 +147,8 @@ class TemperatureSensor
 			*********************************************************************/
 
 			mw.WriteMessage("Beginning Simulation... ");
-
+			Device device = new Device(Configuration.normal_period, "Temperature Sensor", "simulate the temperature of museum and take effect of cooler/heater", em);
+			device.run();
 
 			while ( !Done )
 			{

@@ -35,6 +35,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import common.Configuration;
+import common.Device;
 
 class SecurityMonitor extends Thread
 {
@@ -182,7 +183,8 @@ class SecurityMonitor extends Thread
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-
+	    	Device device = new Device(Configuration.normal_period, "Security Monitor", "Security monitor will display the states of door, window and motion sensors.", em);
+			device.run();
 			while ( !Done )
 			{
 				// Here we get our message queue from the message manager

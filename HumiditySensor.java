@@ -23,7 +23,11 @@
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
+
 import java.util.*;
+
+import common.Configuration;
+import common.Device;
 
 class HumiditySensor
 {
@@ -143,7 +147,9 @@ class HumiditySensor
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-
+			Device device = new Device(Configuration.normal_period, "Humidity Sensor", "simulate the humidity of museum and take effect of humidifier/dehumidifier", em);
+			device.run();
+			
 			mw.WriteMessage("Beginning Simulation... ");
 
 

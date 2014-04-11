@@ -24,7 +24,11 @@
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
+
 import java.util.*;
+
+import common.Configuration;
+import common.Device;
 
 class ECSMonitor extends Thread
 {
@@ -126,7 +130,10 @@ class ECSMonitor extends Thread
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-
+	    	Device device = new Device(Configuration.normal_period, "ECS Monitor", "Display the current humidity and temperature status", em);
+			device.run();
+	    	
+	    	
 			while ( !Done )
 			{
 				// Here we get our message queue from the message manager

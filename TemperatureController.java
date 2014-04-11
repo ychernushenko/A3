@@ -30,7 +30,11 @@
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
+
 import java.util.*;
+
+import common.Configuration;
+import common.Device;
 
 class TemperatureController
 {
@@ -136,7 +140,9 @@ class TemperatureController
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-
+			Device device = new Device(Configuration.normal_period, "Temperature Controller", "turn on/off the cooler/heater", em);
+			device.run();
+			
 			while ( !Done )
 			{
 
