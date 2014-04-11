@@ -2,8 +2,8 @@ package common;
 
 public class Configuration {
 	// Message IDs for heart beat message.
-	public final  static  int critical_period   = 1;
-	public final  static  int normal_period = 2;
+	public final  static  int critical_period   = 1000;
+	public final  static  int normal_period = 2000;
 	public final  static  int HEARTBEAT = 2014;
 
 
