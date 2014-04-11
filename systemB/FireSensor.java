@@ -22,21 +22,59 @@ package systemB;
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
-import java.util.*;
+
+import java.awt.event.ActionEvent;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import systemB.Configuration;
 
 class FireSensor
 {
+	
+	private  MessageManagerInterface managerInterface = null;	// Interface object to the message manager
+
+	private  MessageWindow mw;
+
+	public FireSensor(String title, float winPosX, float winPosY, final MessageManagerInterface em) {
+		managerInterface = em;
+		mw = new MessageWindow(title, winPosX, winPosY);
+		JButton button = new JButton();
+		button.setText("Fire Sensor");
+		button.setEnabled(true);
+		button.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				buttonActionPerformed(evt);
+			}
+		});
+		JFrame buttonFrame = new JFrame();
+		buttonFrame.setBounds(mw.GetX(), mw.GetY(), 50, 80);
+		JPanel buttonPanel = new JPanel();
+		buttonFrame.add(buttonPanel);
+		buttonPanel.add(button);
+		buttonFrame.setVisible(true);
+	}
+
+	private void buttonActionPerformed(ActionEvent evt) {
+		Message msg = new Message( Configuration.FIRE_SENSOR_ID, "F1" );
+		// Here we send the message to the message manager.
+		try{
+			managerInterface.SendMessage( msg );
+			mw.WriteMessage("Fire Alarm Detected!");
+		} // try
+		catch (Exception e){
+			System.out.println( "Error Posting Fire Alarm:: " + e );
+		} // catch
+	}
+	
 	public static void main(String args[])
 	{
 		String MsgMgrIP;				// Message Manager IP address
-		Message Msg = null;				// Message object
+		MessageManagerInterface em = null;
 		MessageQueue eq = null;			// Message Queue
-		int MsgId = 0;					// User specified message ID
-		MessageManagerInterface em = null;// Interface object to the message manager
-		boolean HeaterState = false;	// Heater state: false == off, true == on
-		boolean ChillerState = false;	// Chiller state: false == off, true == on
-		boolean CurrentFireState;		// Current fire State
 		int	Delay = 2500;				// The loop delay (2.5 seconds)
+		Message Msg = null;				// Message object
 		boolean Done = false;			// Loop termination flag
 
 		/////////////////////////////////////////////////////////////////////////////////
@@ -101,58 +139,62 @@ class FireSensor
 								 	//of a percentage of the screen height
 			float WinPosY = 0.3f; 	//This is the Y position of the message window in terms
 								 	//of a percentage of the screen height
+			
+			FireSensor fs = new FireSensor("Fire Sensor", WinPosX, WinPosY, em);
 
-			MessageWindow fw = new MessageWindow("Fire Sensor", WinPosX, WinPosY );
-
-			fw.WriteMessage("Registered with the message manager." );
+			fs.mw.WriteMessage("Registered with the message manager." );
 
 	    	try
 	    	{
-				fw.WriteMessage("   Participant id: " + em.GetMyId() );
-				fw.WriteMessage("   Registration Time: " + em.GetRegistrationTime() );
+	    		fs.mw.WriteMessage("   Participant id: " + em.GetMyId() );
+	    		fs.mw.WriteMessage("   Registration Time: " + em.GetRegistrationTime() );
 
 			} // try
 
 	    	catch (Exception e)
 			{
-				fw.WriteMessage("Error:: " + e);
+	    		fs.mw.WriteMessage("Error:: " + e);
 
 			} // catch
 
-			fw.WriteMessage("\nInitializing Fire Simulation::" );
-
-			CurrentFireState = CoinToss();
-
-			fw.WriteMessage("   Current Fire State:: " + CurrentFireState );
+	    	fs.mw.WriteMessage("\nInitializing Fire Simulation::" );
+	    	
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
 
-			fw.WriteMessage("Beginning Simulation... ");
+			fs.mw.WriteMessage("Beginning Simulation... ");
 
 
-			while ( !Done )
-			{
-				// Post the current FireState
-
-				PostFireState( em, CurrentFireState );
-
-				fw.WriteMessage("Current Fire State::  " + CurrentFireState);
-
+			while ( !Done ){
 				// Get the message queue
-
-				try
-				{
+				try{
 					eq = em.GetMessageQueue();
-
 				} // try
 
-				catch( Exception e )
-				{
-					fw.WriteMessage("Error getting message queue::" + e );
-
+				catch( Exception e ){
+					fs.mw.WriteMessage("Error getting message queue::" + e );
 				} // catch
 
+				int qlen = eq.GetSize();
+
+				for ( int i = 0; i < qlen; i++ ){
+					Msg = eq.GetMessage();
+
+					if ( Msg.GetMessageId() == 99 ){
+						Done = true;
+						fs.mw.WriteMessage("Received End Message" );
+						try{
+							em.UnRegister();
+						} // try
+						catch (Exception e){
+							fs.mw.WriteMessage("Error unregistering: " + e);
+						} // catch
+						fs.mw.WriteMessage("\n\nSimulation Stopped. \n");
+					} // if
+				} // for
+				
+				
 				// Here we wait for a 2.5 seconds before we start the next sample
 
 				try
@@ -163,7 +205,7 @@ class FireSensor
 
 				catch( Exception e )
 				{
-					fw.WriteMessage("Sleep error:: " + e );
+					fs.mw.WriteMessage("Sleep error:: " + e );
 
 				} // catch
 
@@ -176,65 +218,4 @@ class FireSensor
 		} // if
 
 	} // main
-
-	/***************************************************************************
-	* CONCRETE METHOD:: CoinToss
-	* Purpose: This method provides a random true or false value used for
-	* determining tfire state
-	*
-	* Arguments: None.
-	*
-	* Returns: boolean
-	*
-	* Exceptions: None
-	*
-	***************************************************************************/
-
-	static private boolean CoinToss()
-	{
-		Random r = new Random();
-
-		return(r.nextBoolean());
-
-	} // CoinToss
-
-	/***************************************************************************
-	* CONCRETE METHOD:: PostFireState
-	* Purpose: This method posts the specified Fire State value to the
-	* specified message manager. This method assumes an message ID of 11.
-	*
-	* Arguments: MessageManagerInterface ei - this is the messagemanger interface
-	*			 where the message will be posted.
-	*
-	*			 float temperature - this is the temp value.
-	*
-	* Returns: none
-	*
-	* Exceptions: None
-	*
-	***************************************************************************/
-
-	static private void PostFireState(MessageManagerInterface ei, boolean fireState )
-	{
-		// Here we create the message.
-
-		Message msg = new Message( (int) 11, String.valueOf(fireState) );
-
-		// Here we send the message to the message manager.
-
-		try
-		{
-			ei.SendMessage( msg );
-			//System.out.println( "Sent Temp Message" );
-
-		} // try
-
-		catch (Exception e)
-		{
-			System.out.println( "Error Posting Fire State:: " + e );
-
-		} // catch
-
-	} // PostFireState
-
 } // FireSensor

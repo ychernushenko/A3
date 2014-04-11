@@ -1,3 +1,4 @@
+package systemB;
 /******************************************************************************************************************
 * File:FireAlarmController.java
 * Course: 17655
@@ -29,7 +30,7 @@ import InstrumentationPackage.*;
 import MessagePackage.*;
 import java.util.*;
 
-class FireAlarmController
+class SprinklerController
 {
 	public static void main(String args[])
 	{

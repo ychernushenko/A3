@@ -28,11 +28,7 @@ package systemB;
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
-
-import java.util.*;
-
-import common.Configuration;
-import common.Device;
+import systemB.Configuration;
 
 class FireAlarmController
 {
@@ -41,7 +37,6 @@ class FireAlarmController
 		String MsgMgrIP;					// Message Manager IP address
 		Message Msg = null;					// Message object
 		MessageQueue eq = null;				// Message Queue
-		int MsgId = 0;						// User specified message ID
 		MessageManagerInterface em = null;	// Interface object to the message manager
 		boolean FireAlarmState = false;	// FireAlarm state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
@@ -137,11 +132,6 @@ class FireAlarmController
 			** Here we start the main simulation loop
 			*********************************************************************/
 
-			Device device = new Device(Configuration.normal_period, "Fire alarm controller", "Fire alarm controller will send fire alarm message to sprinkler and fire alarm monitor.");
-			device.run();
-	    	
-	    	
-	    	
 			while ( !Done )
 			{
 				try
@@ -170,20 +160,20 @@ class FireAlarmController
 				{
 					Msg = eq.GetMessage();
 
-					if ( Msg.GetMessageId() == 11 )
+					if ( Msg.GetMessageId() == Configuration.FIRE_SENSOR_ID )
 					{
 						if (Msg.GetMessage().equalsIgnoreCase("F1")) // FireAlarm on
 						{
 							FireAlarmState = true;
 							mw.WriteMessage("Received FireAlarm on message" );
-
+							postMessage(em, "F1");
 						} // if
 
 						if (Msg.GetMessage().equalsIgnoreCase("F0")) // FireAlarm off
 						{
 							FireAlarmState = false;
 							mw.WriteMessage("Received FireAlarm off message" );
-
+							postMessage(em, "F0");
 						} // if
 
 					} // if
@@ -256,4 +246,17 @@ class FireAlarmController
 
 	} // main
 
+	
+	static private void postMessage(MessageManagerInterface ei, String m ){
+		// Here we create the message.
+		Message msg = new Message( Configuration.FIRE_CONTROLLER_ID, m );
+		// Here we send the message to the message manager.
+		try{
+			ei.SendMessage( msg );
+		} // try
+		catch (Exception e){
+			System.out.println("Error posting Message:: " + e);
+		} // catch
+	} // PostMessage
+	
 } // FireAlarmControllers
