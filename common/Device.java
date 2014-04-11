@@ -3,7 +3,7 @@ package common;
 import MessagePackage.Message;
 import MessagePackage.MessageManagerInterface;
 
-public class Device implements Runnable{
+public class Device extends Thread{
 
 	private String description;
 	private String deviceName;

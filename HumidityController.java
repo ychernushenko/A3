@@ -141,7 +141,7 @@ class HumidityController
 			** Here we start the main simulation loop
 			*********************************************************************/
 	    	Device device = new Device(Configuration.normal_period, "Humidity Controller", "Turn on/off the humidifier/dehumidifier", em);
-			device.run();
+			device.start();
 	    	
 			while ( !Done )
 			{

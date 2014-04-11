@@ -136,7 +136,7 @@ class SecurityController
 			 *********************************************************************/
 
 			Device device = new Device(Configuration.normal_period, "Security Controller", "Security controller will redirect the security messages if system is armed.", em);
-			device.run();
+			device.start();
 			
 			
 			while ( !Done )

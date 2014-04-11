@@ -148,7 +148,7 @@ class TemperatureSensor
 
 			mw.WriteMessage("Beginning Simulation... ");
 			Device device = new Device(Configuration.normal_period, "Temperature Sensor", "simulate the temperature of museum and take effect of cooler/heater", em);
-			device.run();
+			device.start();
 
 			while ( !Done )
 			{

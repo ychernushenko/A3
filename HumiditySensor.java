@@ -148,7 +148,7 @@ class HumiditySensor
 			** Here we start the main simulation loop
 			*********************************************************************/
 			Device device = new Device(Configuration.normal_period, "Humidity Sensor", "simulate the humidity of museum and take effect of humidifier/dehumidifier", em);
-			device.run();
+			device.start();
 			
 			mw.WriteMessage("Beginning Simulation... ");
 

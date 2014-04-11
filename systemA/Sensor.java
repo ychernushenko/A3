@@ -73,7 +73,7 @@ class Sensor{
 			Sensor ds = new Sensor("Door Sensor", winPosX, winPosY, managerInterface, name, description, messageID, messageText);
 
 			Device device = new Device(Configuration.normal_period, name, description, managerInterface);
-			device.run();
+			device.start();
 			
 			while ( !done ){
 				// Get the message queue

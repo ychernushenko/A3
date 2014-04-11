@@ -131,7 +131,7 @@ class ECSMonitor extends Thread
 			** Here we start the main simulation loop
 			*********************************************************************/
 	    	Device device = new Device(Configuration.normal_period, "ECS Monitor", "Display the current humidity and temperature status", em);
-			device.run();
+			device.start();
 	    	
 	    	
 			while ( !Done )

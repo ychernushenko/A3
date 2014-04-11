@@ -141,7 +141,7 @@ class TemperatureController
 			** Here we start the main simulation loop
 			*********************************************************************/
 			Device device = new Device(Configuration.normal_period, "Temperature Controller", "turn on/off the cooler/heater", em);
-			device.run();
+			device.start();
 			
 			while ( !Done )
 			{
