@@ -63,9 +63,6 @@ public class MaintenanceConsole
 		{
 			Monitor.start(); // Here we start the monitoring and control thread
 			
-			Device device = new Device(Configuration.normal_period, "Security Monitor", "Security monitor will display the states of door, window and motion sensors.");
-			device.run();
-			
 			while (!Done)
 			{
 				// Here, the main thread continues and provides the main menu

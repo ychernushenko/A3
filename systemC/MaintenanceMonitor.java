@@ -45,11 +45,17 @@ class MaintenanceMonitor extends Thread
 	boolean Registered = true;					// Signifies that this class is registered with an message manager.
 	MessageWindow mw = null;					// This is the message window
 	MessageWindow deviceList = null;					// This is the message window
-	private ArrayList<Indicator> indicators;
-	private ArrayList<Boolean> status;
+	private ArrayList<Indicator> indicators = new ArrayList<Indicator>();
+	private ArrayList<Boolean> status = new ArrayList<Boolean>();
 	private int deviceNumber = 0;
 	private Hashtable<String,Integer> map = new Hashtable<String,Integer>();
 	private Hashtable<String,Long> DeviceTime = new Hashtable<String,Long>();
+	
+	private Hashtable<Long,ArrayList<Long>> controllerSensorLink = new Hashtable<>();
+	private Hashtable<String,ArrayList<String>> controllerNameSensorNameLink = new Hashtable<>();
+	private Hashtable<String,Long> controllerInfo = new Hashtable<>();
+	private ArrayList<Long> popularSensors = new ArrayList<>();
+	private ArrayList<Long> popularSensors2 = new ArrayList<>();
 	
 	public MaintenanceMonitor()
 	{
@@ -95,7 +101,7 @@ class MaintenanceMonitor extends Thread
 
 	} // Constructor
 
-	class Checker implements Runnable
+	class Checker extends Thread
 	{
 		@Override
 		public void run() {
@@ -113,7 +119,7 @@ class MaintenanceMonitor extends Thread
 				
 				while (it.hasNext()) {
 					  entry = it.next();
-					  if( entry.getValue()-currentTime > 10000 )
+					  if( currentTime - entry.getValue() > 10000 )
 					  {
 						  //Device is down
 						  DeviceName = entry.getKey();
@@ -125,6 +131,33 @@ class MaintenanceMonitor extends Thread
 						  	  mw.WriteMessage("Device "+DeviceName+" is down!" );
 						  	  status.set(DeviceIndex,false);
 					  	  }
+						  System.out.println("Device Name: " + DeviceName);
+						  //If device is controller - shut down all related sensors
+						  if (controllerInfo.containsKey(DeviceName))
+						  {
+							  System.out.println("Found DeviceName");
+							  Long controllerId = controllerInfo.get(DeviceName);
+							  ArrayList<Long> sensorList = controllerSensorLink.get(controllerId);
+							  for(Iterator<Long> i = sensorList.iterator(); i.hasNext(); ) 
+							  {
+								  	System.out.println("Into the loop");
+								    Long item = i.next();
+								    if(!popularSensors.contains(item))
+								    {
+								    	try
+								    	{
+											System.out.println("Unregister message sent");
+								    		Message evt = new Message( (int) 94, String.valueOf(item) );
+								    		evt.SetSenderId(em.GetMyId());
+									    	em.SendMessage(evt);
+								    	}
+								    	catch(Exception e)
+								    	{
+								    		System.out.println("Error sending message:: " + e);
+								    	}
+								    }
+								}
+						  }
 				      }
 					  else
 					  {
@@ -161,7 +194,6 @@ class MaintenanceMonitor extends Thread
 		boolean Done = false;			// Loop termination flag
 		String DeviceName;				// name of the device
 		String description;				// Description of the device
-		String[] parts;					// used to get device name and description
 
 		if (em != null)
 		{
@@ -196,7 +228,7 @@ class MaintenanceMonitor extends Thread
 			*********************************************************************/
 	    	
 	    	Checker deviceCheck = new Checker();
-	    	deviceCheck.run();
+	    	deviceCheck.start();
 	    	
 			while ( !Done )
 			{
@@ -231,11 +263,12 @@ class MaintenanceMonitor extends Thread
 					
 					if ( Msg.GetMessageId() == Configuration.HEARTBEAT ) // recieved a heartbeat
 					{
-						 parts = Msg.GetMessage().split("|");
+						 String[] parts = Msg.GetMessage().split("#");
 						 DeviceName = parts[0];
 						 description = parts[1];
 						 
-						 if( !map.contains(DeviceName) )
+						 
+						 if( !map.containsKey(DeviceName) )
 						 {
 							 CreateDevice(DeviceName);
 							 
@@ -258,6 +291,58 @@ class MaintenanceMonitor extends Thread
 						 }
 					} // if
 
+					if ( Msg.GetMessageId() == 93 )
+					{
+						String[] parts = Msg.GetMessage().split("#");
+						Long controllerId = Long.valueOf(parts[0]);
+						Long sensorId = Long.valueOf(parts[1]);
+						String controllerName = parts[2];
+						String sensorName = parts[3];
+						
+						//if(!controllerSensorLink.contains(controllerId))
+						//{
+						ArrayList<Long> sensors = new ArrayList<>();
+						ArrayList<String> sensorNames = new ArrayList<>();
+						sensors.add(sensorId);
+						sensorNames.add(sensorName);
+						controllerSensorLink.put(controllerId, sensors);
+						controllerNameSensorNameLink.put(controllerName, sensorNames);
+						controllerInfo.put(controllerName, controllerId);
+						
+						if(!popularSensors2.contains(sensorId))
+						{
+							popularSensors2.add(sensorId);
+						}
+						else
+						{
+							popularSensors.add(sensorId);
+						}
+						/*}
+						else
+						{
+							ArrayList<Long> sensors = new ArrayList<>();
+							ArrayList<String> sensorNames = new ArrayList<>();
+							sensors = controllerSensorLink.get(controllerId);
+							sensorNames = controllerNameSensorNameLink.get(controllerName);
+							sensors.add(sensorId);
+							sensorNames.add(sensorName);
+							controllerSensorLink.put(controllerId, sensors);
+							controllerNameSensorNameLink.put(controllerName, sensorNames);
+							
+							if(!popularSensors2.contains(sensorId))
+							{
+								popularSensors2.add(sensorId);
+							}
+							else
+							{
+								popularSensors.add(sensorId);
+							}
+						}*/
+						//controllerNameSensorNameLink.put(controllerName, sensorName);
+						//controllerInfo.put(controllerId, controllerName);
+						
+						mw.WriteMessage("### CONTROLLER-SENSOR LINK CREATED: " + controllerName + " - " + sensorName + " (" + parts[0] + " - "  + parts[1] );
+					}
 					// If the message ID == 99 then this is a signal that the simulation
 					// is to end. At this point, the loop termination flag is set to
 					// true and this process unregisters from the message manager.

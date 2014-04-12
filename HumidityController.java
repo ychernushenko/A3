@@ -49,6 +49,7 @@ class HumidityController
 		boolean DehumidifierState = false;	// Dehumidifier state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
+		ArrayList<Long> SensorList = new ArrayList<>();
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -170,9 +171,26 @@ class HumidityController
 				for ( int i = 0; i < qlen; i++ )
 				{
 					Msg = eq.GetMessage();
-
+					if ( Msg.GetMessageId() == 2 )
+					{
+						if (!SensorList.contains(Msg.GetSenderId()))
+						{
+							try
+							{
+								SensorList.add(Msg.GetSenderId());
+								Message msg = new Message( (int) 93, String.valueOf(em.GetMyId()) + "#" + String.valueOf(Msg.GetSenderId()) + "#Humidity Controller#Humidity Sensor");
+								em.SendMessage(msg);
+							}
+							catch(Exception e)
+							{
+								System.out.println("Error:: " + e);
+							}
+						}
+					}
+					
 					if ( Msg.GetMessageId() == 4 )
 					{
+						
 						if (Msg.GetMessage().equalsIgnoreCase("H1")) // humidifier on
 						{
 							HumidifierState = true;

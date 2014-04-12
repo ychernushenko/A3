@@ -216,7 +216,22 @@ class HumiditySensor
 						} // if
 
 					} // if
-
+					if (Msg.GetMessageId() == 94)
+					{
+						try
+						{
+							if(Long.valueOf(Msg.GetMessage()) == em.GetMyId())
+							{
+								 System.out.println("Sensor unrigestered!");
+								 em.UnRegister();
+							}
+						}
+						catch(Exception e)
+						{
+							System.out.println("Error:: " + e);
+						}
+						 
+					}
 					// If the message ID == 99 then this is a signal that the simulation
 					// is to end. At this point, the loop termination flag is set to
 					// true and this process unregisters from the message manager.
@@ -359,11 +374,13 @@ class HumiditySensor
 		// Here we create the message.
 
 		Message msg = new Message( (int) 2, String.valueOf(humidity) );
+		
 
 		// Here we send the message to the message manager.
 
 		try
 		{
+			msg.SetSenderId(ei.GetMyId());
 			ei.SendMessage( msg );
 			//mw.WriteMessage( "Sent Humidity Message" );
 
