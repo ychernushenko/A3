@@ -70,7 +70,7 @@ class Sensor{
 			float winPosY = 0.60f;	//This is the Y position of the message window in terms
 			//of a percentage of the screen height
 
-			Sensor ds = new Sensor("Door Sensor", winPosX, winPosY, managerInterface, name, description, messageID, messageText);
+			//Sensor ds = new Sensor("Door Sensor", winPosX, winPosY, managerInterface, name, description, messageID, messageText);
 
 			Device device = new Device(Configuration.normal_period, name, description, managerInterface);
 			device.start();
@@ -82,7 +82,7 @@ class Sensor{
 				} // try
 
 				catch( Exception e ){
-					ds.mw.WriteMessage("Error getting message queue::" + e );
+					mw.WriteMessage("Error getting message queue::" + e );
 				} // catch
 
 				int qlen = eq.GetSize();
@@ -92,14 +92,14 @@ class Sensor{
 
 					if ( Msg.GetMessageId() == 99 ){
 						done = true;
-						ds.mw.WriteMessage("Received End Message" );
+						mw.WriteMessage("Received End Message" );
 						try{
 							managerInterface.UnRegister();
 						} // try
 						catch (Exception e){
-							ds.mw.WriteMessage("Error unregistering: " + e);
+							mw.WriteMessage("Error unregistering: " + e);
 						} // catch
-						ds.mw.WriteMessage("\n\nSimulation Stopped. \n");
+						mw.WriteMessage("\n\nSimulation Stopped. \n");
 					} // if
 				} // for
 
@@ -111,7 +111,7 @@ class Sensor{
 				} // try
 
 				catch( Exception e ){
-					ds.mw.WriteMessage("Sleep error:: " + e );
+					mw.WriteMessage("Sleep error:: " + e );
 
 				} // catch
 
