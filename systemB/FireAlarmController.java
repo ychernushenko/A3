@@ -28,7 +28,7 @@ package systemB;
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
-import systemB.Configuration;
+import common.Configuration;
 
 class FireAlarmController
 {
@@ -38,7 +38,6 @@ class FireAlarmController
 		Message Msg = null;					// Message object
 		MessageQueue eq = null;				// Message Queue
 		MessageManagerInterface em = null;	// Interface object to the message manager
-		boolean FireAlarmState = false;	// FireAlarm state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
 
@@ -109,10 +108,7 @@ class FireAlarmController
 
 			MessageWindow mw = new MessageWindow("FireAlarm Controller Status Console", WinPosX, WinPosY);
 
-			// Now we put the indicators directly under the FireAlarm status and control panel
-
-			Indicator fi = new Indicator ("FireAlarm OFF", mw.GetX(), mw.GetY()+mw.Height());
-
+			// Now we put the indicators directly under the FireAlarm control panel
 			mw.WriteMessage("Registered with the message manager." );
 
 	    	try
@@ -164,16 +160,8 @@ class FireAlarmController
 					{
 						if (Msg.GetMessage().equalsIgnoreCase("F1")) // FireAlarm on
 						{
-							FireAlarmState = true;
 							mw.WriteMessage("Received FireAlarm on message" );
-							postMessage(em, "F1");
-						} // if
-
-						if (Msg.GetMessage().equalsIgnoreCase("F0")) // FireAlarm off
-						{
-							FireAlarmState = false;
-							mw.WriteMessage("Received FireAlarm off message" );
-							postMessage(em, "F0");
+							postMessage(em, "FA");
 						} // if
 
 					} // if
@@ -203,26 +191,10 @@ class FireAlarmController
 						// Get rid of the indicators. The message panel is left for the
 						// user to exit so they can see the last message posted.
 
-						fi.dispose();
-
 					} // if
 
 				} // for
 
-				// Update the lamp status
-
-				if (FireAlarmState)
-				{
-					// Set to green, FireAlarm is on
-
-					fi.SetLampColorAndMessage("FIRE_ALARM ON", 1);
-
-				} else {
-
-					// Set to black, FireAlarm is off
-					fi.SetLampColorAndMessage("FIRE_ALARM OFF", 0);
-
-				} // if
 
 				try
 				{

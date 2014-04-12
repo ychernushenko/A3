@@ -28,20 +28,30 @@ package systemB;
 ******************************************************************************************************************/
 import InstrumentationPackage.*;
 import MessagePackage.*;
+
+import java.awt.event.ActionEvent;
 import java.util.*;
+
+import javax.swing.JButton;
+
+import common.Configuration;
 
 class SprinklerController
 {
+	
+	
 	public static void main(String args[])
 	{
 		String MsgMgrIP;					// Message Manager IP address
 		Message Msg = null;					// Message object
 		MessageQueue eq = null;				// Message Queue
-		int MsgId = 0;						// User specified message ID
 		MessageManagerInterface em = null;	// Interface object to the message manager
-		boolean FireAlarmState = false;	// FireAlarm state: false == off, true == on
 		int	Delay = 2500;					// The loop delay (2.5 seconds)
 		boolean Done = false;				// Loop termination flag
+		boolean SprinklerState = false;		// SprinklerState on/off
+		boolean FireAlarmState = false;		// FireAlarm message received
+		long FireAlarmTimeStamp=0;
+
 
 		/////////////////////////////////////////////////////////////////////////////////
 		// Get the IP address of the message manager
@@ -98,22 +108,22 @@ class SprinklerController
 		{
 			System.out.println("Registered with the message manager." );
 
-			/* Now we create the fire control status and message panel
+			/* Now we create the sprinkler control status and message panel
 			** We put this panel about 2/3s the way down the terminal, aligned to the left
 			** of the terminal. The status indicators are placed directly under this panel
 			*/
 
-			float WinPosX = 0.0f; 	//This is the X position of the message window in terms
+			float WinPosX = 0.5f; 	//This is the X position of the message window in terms
 									//of a percentage of the screen height
 			float WinPosY = 0.60f;	//This is the Y position of the message window in terms
 								 	//of a percentage of the screen height
 
-			MessageWindow mw = new MessageWindow("FireAlarm Controller Status Console", WinPosX, WinPosY);
+			MessageWindow mw = new MessageWindow("Sprinkler Controller Status Console", WinPosX, WinPosY);
 
-			// Now we put the indicators directly under the FireAlarm status and control panel
+			// Now we put the indicators directly under the Sprinkler status and control panel
 
-			Indicator fi = new Indicator ("FireAlarm OFF", mw.GetX(), mw.GetY()+mw.Height());
-
+			Indicator fi = new Indicator ("Sprinkler OFF", mw.GetX(), mw.GetY()+mw.Height());
+			
 			mw.WriteMessage("Registered with the message manager." );
 
 	    	try
@@ -149,11 +159,11 @@ class SprinklerController
 
 				// If there are messages in the queue, we read through them.
 				// We are looking for MessageIDs = 11, this is a request to turn the
-				// FireAlarm on/off. Note that we get all the messages
+				// Sprinkler on/off. Note that we get all the messages
 				// at once... there is a 2.5 second delay between samples,.. so
 				// the assumption is that there should only be a message at most.
 				// If there are more, it is the last message that will effect the
-				// output of the FireAlarm as it would in reality.
+				// output of the Sprinkler as it would in reality.
 
 				int qlen = eq.GetSize();
 
@@ -161,24 +171,41 @@ class SprinklerController
 				{
 					Msg = eq.GetMessage();
 
-					if ( Msg.GetMessageId() == 11 )
+					if ( Msg.GetMessageId() == Configuration.SECURITY_MONITOR_ID )
 					{
-						if (Msg.GetMessage().equalsIgnoreCase("F1")) // FireAlarm on
+						if (Msg.GetMessage().equalsIgnoreCase("S1")) // FireAlarm on
 						{
-							FireAlarmState = true;
-							mw.WriteMessage("Received FireAlarm on message" );
-
+							SprinklerState = true;
+							mw.WriteMessage("Received Sprinkler ON message" );
+							fi.SetLampColorAndMessage("Sprinkler ON", 1);
 						} // if
-
-						if (Msg.GetMessage().equalsIgnoreCase("F0")) // FireAlarm off
+						
+						if (Msg.GetMessage().equalsIgnoreCase("S0")) // FireAlarm on
 						{
+							SprinklerState = false;
 							FireAlarmState = false;
-							mw.WriteMessage("Received FireAlarm off message" );
-
+							mw.WriteMessage("Received Sprinkler OFF message" );
+							fi.SetLampColorAndMessage("Sprinkler OFF", 0);
 						} // if
 
 					} // if
+					
+					if ( Msg.GetMessageId() == Configuration.FIRE_CONTROLLER_ID )
+					{
+							FireAlarmState = true;
+							mw.WriteMessage("Received Fire Alarm message" );
+							FireAlarmTimeStamp = System.currentTimeMillis();
 
+					} // if
+					
+					if (FireAlarmState && !SprinklerState) {
+						if ((System.currentTimeMillis() - FireAlarmTimeStamp) > 10000) {
+							mw.WriteMessage("Received Sprinkler ON message" );
+							fi.SetLampColorAndMessage("Sprinkler ON", 1);
+							SprinklerState = true;
+						}
+					}
+					
 					// If the message ID == 99 then this is a signal that the simulation
 					// is to end. At this point, the loop termination flag is set to
 					// true and this process unregisters from the message manager.
@@ -209,21 +236,6 @@ class SprinklerController
 					} // if
 
 				} // for
-
-				// Update the lamp status
-
-				if (FireAlarmState)
-				{
-					// Set to green, FireAlarm is on
-
-					fi.SetLampColorAndMessage("FIRE_ALARM ON", 1);
-
-				} else {
-
-					// Set to black, FireAlarm is off
-					fi.SetLampColorAndMessage("FIRE_ALARM OFF", 0);
-
-				} // if
 
 				try
 				{

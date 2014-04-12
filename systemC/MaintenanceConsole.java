@@ -62,7 +62,7 @@ public class MaintenanceConsole
 		if (Monitor.IsRegistered() )
 		{
 			Monitor.start(); // Here we start the monitoring and control thread
-			
+
 			while (!Done)
 			{
 				// Here, the main thread continues and provides the main menu

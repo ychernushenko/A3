@@ -52,6 +52,7 @@ class SecurityMonitor extends Thread
 	private JButton Close_door;
 	private JButton Close_motion;
 	private JButton Close_fire;
+	private JButton Start_Sprinkler;
 	Indicator dr;
 	Indicator wi;
 	Indicator mo;
@@ -146,7 +147,7 @@ class SecurityMonitor extends Thread
 			Close_motion.setEnabled(true);
 			
 			Close_fire = new JButton();
-			Close_fire.setText("Shutdown fire alarm");
+			Close_fire.setText("Shutdown fire alarm and sprinkler");
 			Close_fire.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
 						FirebuttonActionPerformed(evt);
@@ -154,11 +155,20 @@ class SecurityMonitor extends Thread
 			});
 			Close_fire.setEnabled(true);
 			
+			Start_Sprinkler = new JButton();
+			Start_Sprinkler.setText("Start sprinkler");
+			Start_Sprinkler.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						SprinklerbuttonActionPerformed(evt);
+				}
+			});
+			Start_Sprinkler.setEnabled(true);
+			
 			mw = new MessageWindow("Security Monitoring Console", 0, 0);
-			fa = new Indicator ("Fire", mw.GetX()+ mw.Width(), (int)(mw.Height()), 1 );
-			wi = new Indicator ("Window", mw.GetX()+ mw.Width(), (int)(mw.Height()/2), 1 );
-			mo = new Indicator ("Motion", mw.GetX()+ mw.Width(), (int)(mw.Height()/3), 1 );
-			dr = new Indicator ("Door", mw.GetX()+ mw.Width(), 0, 1 );
+			dr = new Indicator ("Door", mw.GetX()+ mw.Width(), (int)(mw.Height()), 1 );
+			mo = new Indicator ("Motion", mw.GetX()+ mw.Width(), (int)(2*mw.Height()/3), 1 );
+			wi = new Indicator ("Window", mw.GetX()+ mw.Width(), (int)(mw.Height()/3), 1 );
+			fa = new Indicator ("Fire", mw.GetX()+ mw.Width(), 0, 1 );
 			
 			JFrame frame1 = new JFrame("JAVA");
 			frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -180,9 +190,15 @@ class SecurityMonitor extends Thread
 			
 			JFrame frame4 = new JFrame("JAVA");
 			frame4.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			frame4.setSize(200,50);
+			frame4.setSize(250,50);
 			frame4.getContentPane().add(Close_fire);
 			frame4.setVisible(true);
+			
+			JFrame frame5 = new JFrame("JAVA");
+			frame5.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame5.setSize(200,50);
+			frame5.getContentPane().add(Start_Sprinkler);
+			frame5.setVisible(true);
 
 			mw.WriteMessage( "Registered with the message manager." );
 
@@ -261,7 +277,7 @@ class SecurityMonitor extends Thread
 						MotionDetected = true;
 					} // if
 					
-					if ( Msg.GetMessageId() == Configuration.Fire_detected ) // Fire
+					if ( Msg.GetMessageId() == Configuration.FIRE_CONTROLLER_ID ) // Fire
 					{
 						fa.SetLampColorAndMessage("FIRE", 3);
 						mw.WriteMessage("Fire has been discovered!" );
@@ -461,6 +477,26 @@ class SecurityMonitor extends Thread
 	private void FirebuttonActionPerformed(ActionEvent evt) {
 
 		FireDetected = false;
+		
+		postMessage(em, "S0");
 
 	}
+	
+	private void SprinklerbuttonActionPerformed(ActionEvent evt) {
+		
+		postMessage(em, "S1");
+
+	}
+	
+	static private void postMessage(MessageManagerInterface ei, String m ){
+		// Here we create the message.
+		Message msg = new Message( Configuration.SECURITY_MONITOR_ID, m );
+		// Here we send the message to the message manager.
+		try{
+			ei.SendMessage( msg );
+		} // try
+		catch (Exception e){
+			System.out.println("Error posting Message:: " + e);
+		} // catch
+	} // PostMessage
 } // ECSMonitor

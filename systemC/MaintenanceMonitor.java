@@ -50,13 +50,13 @@ class MaintenanceMonitor extends Thread
 	private int deviceNumber = 0;
 	private Hashtable<String,Integer> map = new Hashtable<String,Integer>();
 	private Hashtable<String,Long> DeviceTime = new Hashtable<String,Long>();
-	
+
 	private Hashtable<Long,ArrayList<Long>> controllerSensorLink = new Hashtable<>();
 	private Hashtable<String,ArrayList<String>> controllerNameSensorNameLink = new Hashtable<>();
 	private Hashtable<String,Long> controllerInfo = new Hashtable<>();
 	private ArrayList<Long> popularSensors = new ArrayList<>();
 	private ArrayList<Long> popularSensors2 = new ArrayList<>();
-	
+
 	public MaintenanceMonitor()
 	{
 		// message manager is on the local system
@@ -110,13 +110,13 @@ class MaintenanceMonitor extends Thread
 			Map.Entry<String, Long> entry;
 			String DeviceName;
 			int DeviceIndex;
-			
+
 			while(true){
 				currentTime = System.currentTimeMillis();
-				
+
 				//all the devices in the system
 				it = DeviceTime.entrySet().iterator();
-				
+
 				while (it.hasNext()) {
 					  entry = it.next();
 					  if( currentTime - entry.getValue() > 10000 )
@@ -173,7 +173,7 @@ class MaintenanceMonitor extends Thread
 					  	  }
 					  }
 				}
-				
+
 				try{
 					Thread.sleep(10000);
 				}
@@ -184,7 +184,7 @@ class MaintenanceMonitor extends Thread
 			}		
 		}
 	}
-	
+
 	public void run()
 	{
 		Message Msg = null;				// Message object
@@ -202,9 +202,9 @@ class MaintenanceMonitor extends Thread
 			// because we do not know if the temperature/humidity is high/low.
 			// This panel is placed in the upper left hand corner and the status
 			// indicators are placed directly to the right, one on top of the other
-			
+
 			// Initialize all buttons
-		
+
 			mw = new MessageWindow("Maintenance Monitoring Console", 0, 0);
 			deviceList = new MessageWindow("Device List", 500, 500);
 			mw.WriteMessage( "Registered with the message manager." );
@@ -226,10 +226,10 @@ class MaintenanceMonitor extends Thread
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-	    	
+
 	    	Checker deviceCheck = new Checker();
 	    	deviceCheck.start();
-	    	
+
 			while ( !Done )
 			{
 				// Here we get our message queue from the message manager
@@ -260,18 +260,18 @@ class MaintenanceMonitor extends Thread
 				for ( int i = 0; i < qlen; i++ )
 				{
 					Msg = eq.GetMessage();
-					
+
 					if ( Msg.GetMessageId() == Configuration.HEARTBEAT ) // recieved a heartbeat
 					{
 						 String[] parts = Msg.GetMessage().split("#");
 						 DeviceName = parts[0];
 						 description = parts[1];
-						 
-						 
+
+
 						 if( !map.containsKey(DeviceName) )
 						 {
 							 CreateDevice(DeviceName);
-							 
+
 							 try
 						    {
 								mw.WriteMessage("  Device:" + DeviceName + "Registered");
@@ -298,7 +298,7 @@ class MaintenanceMonitor extends Thread
 						Long sensorId = Long.valueOf(parts[1]);
 						String controllerName = parts[2];
 						String sensorName = parts[3];
-						
+
 						//if(!controllerSensorLink.contains(controllerId))
 						//{
 						ArrayList<Long> sensors = new ArrayList<>();
@@ -308,7 +308,7 @@ class MaintenanceMonitor extends Thread
 						controllerSensorLink.put(controllerId, sensors);
 						controllerNameSensorNameLink.put(controllerName, sensorNames);
 						controllerInfo.put(controllerName, controllerId);
-						
+
 						if(!popularSensors2.contains(sensorId))
 						{
 							popularSensors2.add(sensorId);
@@ -340,7 +340,7 @@ class MaintenanceMonitor extends Thread
 						}*/
 						//controllerNameSensorNameLink.put(controllerName, sensorName);
 						//controllerInfo.put(controllerId, controllerName);
-						
+
 						mw.WriteMessage("### CONTROLLER-SENSOR LINK CREATED: " + controllerName + " - " + sensorName + " (" + parts[0] + " - "  + parts[1] );
 					}
 					// If the message ID == 99 then this is a signal that the simulation
@@ -456,21 +456,21 @@ class MaintenanceMonitor extends Thread
 		} // catch
 
 	} // Halt
-	
+
 	void CreateDevice( String DeviceName )
 	{
 		if( map.containsKey(DeviceName) )
 		{
 			return;
 		}
-		
+
 		int newIndex = deviceNumber;
 		Indicator newIn = new Indicator(DeviceName, mw.GetX()+ mw.Width(), (int)(deviceNumber*mw.Height()/2), 1);
 		indicators.add(newIndex, newIn);
 		status.add(newIndex, true);
 		map.put(DeviceName, newIndex);
 		DeviceTime.put(DeviceName, System.currentTimeMillis());
-		
+
 		deviceNumber++;
 	}
 } // ECSMonitor

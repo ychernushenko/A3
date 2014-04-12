@@ -28,7 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import systemB.Configuration;
+import common.Configuration;
 
 class FireSensor
 {
