@@ -143,7 +143,7 @@ class HumidityController
 			*********************************************************************/
 	    	Device device = new Device(Configuration.normal_period, "Humidity Controller", "Turn on/off the humidifier/dehumidifier", em);
 			device.start();
-
+	    	
 			while ( !Done )
 			{
 				try
@@ -187,10 +187,10 @@ class HumidityController
 							}
 						}
 					}
-
+					
 					if ( Msg.GetMessageId() == 4 )
 					{
-
+						
 						if (Msg.GetMessage().equalsIgnoreCase("H1")) // humidifier on
 						{
 							HumidifierState = true;

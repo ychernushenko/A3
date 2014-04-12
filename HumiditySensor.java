@@ -149,7 +149,7 @@ class HumiditySensor
 			*********************************************************************/
 			Device device = new Device(Configuration.normal_period, "Humidity Sensor", "simulate the humidity of museum and take effect of humidifier/dehumidifier", em);
 			device.start();
-
+			
 			mw.WriteMessage("Beginning Simulation... ");
 
 
@@ -222,15 +222,16 @@ class HumiditySensor
 						{
 							if(Long.valueOf(Msg.GetMessage()) == em.GetMyId())
 							{
-								 System.out.println("Sensor unrigestered!");
 								 em.UnRegister();
+								 System.out.println("Sensor unrigestered!");
+								 System.exit(0);
 							}
 						}
 						catch(Exception e)
 						{
 							System.out.println("Error:: " + e);
 						}
-
+						 
 					}
 					// If the message ID == 99 then this is a signal that the simulation
 					// is to end. At this point, the loop termination flag is set to
@@ -374,7 +375,7 @@ class HumiditySensor
 		// Here we create the message.
 
 		Message msg = new Message( (int) 2, String.valueOf(humidity) );
-
+		
 
 		// Here we send the message to the message manager.
 
