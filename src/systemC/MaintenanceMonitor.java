@@ -119,7 +119,7 @@ class MaintenanceMonitor extends Thread
 				
 				while (it.hasNext()) {
 					  entry = it.next();
-					  if( currentTime - entry.getValue() > 10000 )
+					  if( currentTime - entry.getValue() > 5000 )
 					  {
 						  //Device is down
 						  DeviceName = entry.getKey();

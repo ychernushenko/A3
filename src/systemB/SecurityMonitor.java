@@ -230,7 +230,7 @@ class SecurityMonitor extends Thread
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-	    	Device device = new Device(Configuration.normal_period, "Security Monitor", "Security monitor will display the states of door, window and motion sensors.", em);
+	    	Device device = new Device(Configuration.normal_period, "Security Monitor", "Security monitor will display the states of door, window and motion sensors, and fire alarm.", em);
 			device.start();
 			while ( !Done )
 			{

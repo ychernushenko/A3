@@ -24,11 +24,13 @@ import InstrumentationPackage.*;
 import MessagePackage.*;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import common.Configuration;
+import common.Device;
 
 class FireSensor
 {
@@ -166,6 +168,8 @@ class FireSensor
 
 			fs.mw.WriteMessage("Beginning Simulation... ");
 
+			Device device = new Device(Configuration.critical_period, "Fire Sensor", "Initiate fire alarm", em);
+			device.start();
 
 			while ( !Done ){
 				// Get the message queue

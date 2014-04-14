@@ -35,6 +35,7 @@ import java.util.*;
 import javax.swing.JButton;
 
 import common.Configuration;
+import common.Device;
 
 class SprinklerController
 {
@@ -142,7 +143,8 @@ class SprinklerController
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-
+	    	Device device = new Device(Configuration.critical_period, "Sprinkler Controller", "Receive fire alarm and control sprinkler", em);
+			device.start();
 			while ( !Done )
 			{
 				try

@@ -29,6 +29,7 @@ package systemB;
 import InstrumentationPackage.*;
 import MessagePackage.*;
 import common.Configuration;
+import common.Device;
 
 class FireAlarmController
 {
@@ -127,7 +128,9 @@ class FireAlarmController
 			/********************************************************************
 			** Here we start the main simulation loop
 			*********************************************************************/
-
+	    	Device device = new Device(Configuration.critical_period, "Fire Alarm", "Receive fire alarm and resend to sprinkler controller and monitor", em);
+			device.start();
+	    	
 			while ( !Done )
 			{
 				try
