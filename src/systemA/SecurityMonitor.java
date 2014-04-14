@@ -50,11 +50,11 @@ class SecurityMonitor extends Thread
 	private JButton Close_win;
 	private JButton Close_door;
 	private JButton Close_motion;
+
 	Indicator dr;
 	Indicator wi;
 	Indicator mo;
-	Indicator fa;
-	
+
 	public SecurityMonitor()
 	{
 		// message manager is on the local system
@@ -152,7 +152,9 @@ class SecurityMonitor extends Thread
 			mw = new MessageWindow("Security Monitoring Console", 0, 0);
 			dr = new Indicator ("Door", mw.GetX(), (int)(mw.Height()), 1 );
 			wi = new Indicator ("Window", mw.GetX()+ (int)(mw.Width()/4), (int)(mw.Height()), 1 );
-			mo = new Indicator ("Motion", mw.GetX()+ (int)(2*mw.Width()/4), (int)(mw.Height()), 1 );			
+			mo = new Indicator ("Motion", mw.GetX()+ (int)(2*mw.Width()/4), (int)(mw.Height()), 1 );
+
+			
 			JFrame frame1 = new JFrame();
 			frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame1.setBounds(mw.GetX(), (int)(mw.Height())+100, 400, 150);
@@ -266,12 +268,6 @@ class SecurityMonitor extends Thread
 						MotionDetected = true;
 					} // if
 					
-					if ( Msg.GetMessageId() == Configuration.FIRE_CONTROLLER_ID ) // Fire
-					{
-						fa.SetLampColorAndMessage("FIRE", 3);
-						mw.WriteMessage("Fire has been discovered!" );
-						FireDetected = true;
-					} // if
 
 					// If the message ID == 99 then this is a signal that the simulation
 					// is to end. At this point, the loop termination flag is set to
@@ -301,7 +297,6 @@ class SecurityMonitor extends Thread
 						dr.dispose();
 						wi.dispose();
 						mo.dispose();
-						fa.dispose();
 
 					} // if
 
@@ -320,11 +315,6 @@ class SecurityMonitor extends Thread
 				if( !MotionDetected )
 				{
 					mo.SetLampColorAndMessage("Motion", 1);
-				}
-				
-				if( !FireDetected )
-				{
-					fa.SetLampColorAndMessage("Fire", 1);
 				}
 
 				try
@@ -462,30 +452,5 @@ class SecurityMonitor extends Thread
 		MotionDetected = false;
 
 	}
-	
-	private void FirebuttonActionPerformed(ActionEvent evt) {
 
-		FireDetected = false;
-		
-		postMessage(em, "S0");
-
-	}
-	
-	private void SprinklerbuttonActionPerformed(ActionEvent evt) {
-		
-		postMessage(em, "S1");
-
-	}
-	
-	static private void postMessage(MessageManagerInterface ei, String m ){
-		// Here we create the message.
-		Message msg = new Message( Configuration.SECURITY_MONITOR_ID, m );
-		// Here we send the message to the message manager.
-		try{
-			ei.SendMessage( msg );
-		} // try
-		catch (Exception e){
-			System.out.println("Error posting Message:: " + e);
-		} // catch
-	} // PostMessage
 } // ECSMonitor
