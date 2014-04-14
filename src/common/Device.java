@@ -36,6 +36,6 @@ public class Device extends Thread{
 	}
 
 	private String formatHeartBeat(){
-		return deviceName+"|"+description;
+		return deviceName+"#"+description;
 	}
 }
